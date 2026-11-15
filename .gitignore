@@ -42,10 +42,12 @@ Thumbs.db
 package-lock.json
 yarn.lock
 
-# Image files (too large for GitHub web upload - use Git LFS or CDN)
-images/
-*.png
-*.jpg
-*.jpeg
-*.gif
+# Vendor files
 vendor/
+
+# OS and temporary files
+*.bak
+*.backup
+*~
+.tmp
+.temp
