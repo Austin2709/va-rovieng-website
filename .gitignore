@@ -1,0 +1,51 @@
+# OS and Editor files
+.DS_Store
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.env
+.env.local
+.DS_Store
+
+# Node modules (if using any)
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Build and output
+dist/
+build/
+*.log
+
+# Temporary files
+*.tmp
+*.temp
+.cache/
+
+# IDE specific files
+*.sublime-project
+*.sublime-workspace
+.vscode/settings.json
+
+# OS-specific
+Thumbs.db
+.directory
+
+# Backup files
+*.bak
+*.backup
+*~
+
+# Dependencies lock files (if applicable)
+package-lock.json
+yarn.lock
+
+# Image files (too large for GitHub web upload - use Git LFS or CDN)
+images/
+*.png
+*.jpg
+*.jpeg
+*.gif
+vendor/
