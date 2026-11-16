@@ -1,4 +1,4 @@
-const CACHE_NAME = "va-rovieng-v89";
+const CACHE_NAME = "va-rovieng-v90";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -39,6 +39,10 @@ const APP_SHELL = [
   "./images/machinery-10.png",
   "./images/copper-sample.jpg",
   "./images/gold-sample.jpg",
+  "./images/certificate-of-incorporation.png",
+  "./images/patent-tax-2026.png",
+  "./images/patent-tax-certificate.png",
+  "./images/vat-registration-certificate.png",
   "./images/va-rovieng-favicon-48.png",
   "./images/va-rovieng-icon-180.png",
   "./images/va-rovieng-icon-192.png",
