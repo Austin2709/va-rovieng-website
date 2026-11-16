@@ -84,7 +84,7 @@ body.menu-open {
   width: 1px;
   background: linear-gradient(to bottom, var(--gold), var(--blue));
   transform: translateX(-50%);
-  display: none;
+  display: block;
 }
 
 .page-scrollbar-tick {
