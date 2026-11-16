@@ -9,12 +9,12 @@ import git as git_module
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 
 # Set git executable path from GitHub Desktop BEFORE importing Repo
-git_executable = r'C:\Users\MSI\AppData\Local\GitHubDesktop\app-3.6.11\resources\app\git\ucrt64\bin\git.exe'
+git_executable = r'C:\Users\MSI\AppData\Local\GitHubDesktop\app-3.6.11\resources\app\git\cmd\git.exe'
 os.environ['GIT_PYTHON_GIT_EXECUTABLE'] = git_executable
 os.environ['GIT_PYTHON_REFRESH'] = 'quiet'
 
 # Add to PATH
-os.environ['PATH'] = r'C:\Users\MSI\AppData\Local\GitHubDesktop\app-3.6.11\resources\app\git\ucrt64\bin' + ';' + os.environ.get('PATH', '')
+os.environ['PATH'] = r'C:\Users\MSI\AppData\Local\GitHubDesktop\app-3.6.11\resources\app\git\cmd' + ';' + os.environ.get('PATH', '')
 
 from git import Repo
 
