@@ -1645,7 +1645,7 @@ h2 em {
 
 @media (max-width: 520px) {
   .page-scrollbar {
-    display: none;
+    display: flex;
   }
 
   .brand-logo {
