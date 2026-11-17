@@ -13,8 +13,64 @@ const photoDialog = document.querySelector(".photo-dialog");
 const photoDialogClose = document.querySelector(".photo-dialog-close");
 const photoDialogImage = document.querySelector("#photo-dialog-image");
 const photoDialogCaption = document.querySelector("#photo-dialog-caption");
+const photoDialogViewport = photoDialog?.querySelector(".photo-dialog-viewport");
+const photoZoomLevel = photoDialog?.querySelector(".photo-zoom-level");
+const projectMapTrigger = document.querySelector(".project-map-trigger");
+const pageTransitionOverlay = document.querySelector(".page-transition-overlay");
 const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 let activeSlideIndex = 0;
+let photoZoom = 1;
+let photoPanX = 0;
+let photoPanY = 0;
+let photoPinchState = null;
+let photoPointerMoved = false;
+let photoIgnoreNextClick = false;
+const photoPointers = new Map();
+
+if (document.body && !prefersReducedMotion) {
+  window.requestAnimationFrame(() => {
+    document.body.classList.add("is-ready");
+  });
+} else if (document.body) {
+  document.body.classList.add("is-ready");
+}
+
+if (pageTransitionOverlay && !prefersReducedMotion) {
+  const triggerPageTransition = (targetUrl) => {
+    if (!targetUrl) {
+      return;
+    }
+
+    document.body.classList.add("is-page-transitioning");
+    pageTransitionOverlay.classList.add("is-visible");
+    window.setTimeout(() => {
+      window.location.assign(targetUrl);
+    }, 220);
+  };
+
+  document.querySelectorAll('a[href]').forEach((link) => {
+    link.addEventListener("click", (event) => {
+      const href = link.getAttribute("href") || "";
+      if (
+        href === "" ||
+        href.startsWith("#") ||
+        href.startsWith("mailto:") ||
+        href.startsWith("tel:") ||
+        link.target === "_blank"
+      ) {
+        return;
+      }
+
+      const targetHref = new URL(href, window.location.href).href;
+      if (targetHref === window.location.href) {
+        return;
+      }
+
+      event.preventDefault();
+      triggerPageTransition(targetHref);
+    });
+  });
+}
 
 function setMenuOpen(isOpen) {
   if (!menuToggle || !primaryNav) {
@@ -39,7 +95,7 @@ if (menuToggle) {
 
 window.addEventListener("resize", () => {
   if (
-    window.matchMedia("(min-width: 901px)").matches &&
+    window.matchMedia("(min-width: 1401px)").matches &&
     menuToggle?.getAttribute("aria-expanded") === "true"
   ) {
     setMenuOpen(false);
@@ -79,12 +135,216 @@ function openPhotoViewer(source, caption) {
     return;
   }
 
+  resetPhotoZoom();
   photoDialogImage.src = source;
   photoDialogImage.alt = caption;
   photoDialogCaption.textContent = caption;
+  fitPhotoViewport();
   if (!photoDialog.open) {
     photoDialog.showModal();
   }
+}
+
+function fitPhotoViewport() {
+  if (!photoDialogViewport || !photoDialogImage?.naturalWidth) {
+    return;
+  }
+
+  const aspectRatio = photoDialogImage.naturalWidth / photoDialogImage.naturalHeight;
+  const maximumWidth = Math.min(window.innerWidth - 72, 1200);
+  const maximumHeight = Math.min(window.innerHeight * 0.68, 928);
+  let width = maximumWidth;
+  let height = width / aspectRatio;
+
+  if (height > maximumHeight) {
+    height = maximumHeight;
+    width = height * aspectRatio;
+  }
+
+  photoDialogViewport.style.width = `${width}px`;
+  photoDialogViewport.style.height = `${height}px`;
+  updatePhotoZoom();
+}
+
+function clampPhotoPan() {
+  if (!photoDialogViewport || !photoDialogImage) {
+    photoPanX = 0;
+    photoPanY = 0;
+    return;
+  }
+
+  const maximumX = Math.max(
+    0,
+    (photoDialogImage.clientWidth * photoZoom - photoDialogViewport.clientWidth) / 2,
+  );
+  const maximumY = Math.max(
+    0,
+    (photoDialogImage.clientHeight * photoZoom - photoDialogViewport.clientHeight) / 2,
+  );
+  photoPanX = Math.max(-maximumX, Math.min(maximumX, photoPanX));
+  photoPanY = Math.max(-maximumY, Math.min(maximumY, photoPanY));
+}
+
+function updatePhotoZoom() {
+  if (!photoDialogImage || !photoDialogViewport) {
+    return;
+  }
+
+  clampPhotoPan();
+  photoDialogImage.style.transform =
+    `translate(${photoPanX}px, ${photoPanY}px) scale(${photoZoom})`;
+  photoDialogViewport.classList.toggle("is-zoomed", photoZoom > 1);
+  photoDialogViewport.classList.toggle("is-panning", photoPointers.size > 0 && photoZoom > 1);
+  photoDialogViewport.setAttribute(
+    "aria-label",
+    `Image viewer, zoom ${Math.round(photoZoom * 100)} percent. Scroll or pinch to zoom; drag to move.`,
+  );
+  if (photoZoomLevel) {
+    photoZoomLevel.value = `${Math.round(photoZoom * 100)}%`;
+  }
+}
+
+function resetPhotoZoom() {
+  photoZoom = 1;
+  photoPanX = 0;
+  photoPanY = 0;
+  photoPinchState = null;
+  photoPointerMoved = false;
+  photoIgnoreNextClick = false;
+  photoPointers.clear();
+  updatePhotoZoom();
+}
+
+function setPhotoZoom(nextZoom, anchorX, anchorY) {
+  if (!photoDialogViewport) {
+    return;
+  }
+
+  const boundedZoom = Math.max(1, Math.min(5, nextZoom));
+  const bounds = photoDialogViewport.getBoundingClientRect();
+  const centerX = bounds.left + bounds.width / 2;
+  const centerY = bounds.top + bounds.height / 2;
+  const relativeX = (anchorX ?? centerX) - centerX;
+  const relativeY = (anchorY ?? centerY) - centerY;
+  const zoomRatio = boundedZoom / photoZoom;
+  photoPanX = relativeX - (relativeX - photoPanX) * zoomRatio;
+  photoPanY = relativeY - (relativeY - photoPanY) * zoomRatio;
+  photoZoom = boundedZoom;
+  updatePhotoZoom();
+}
+
+if (photoDialogViewport) {
+  photoDialogImage?.addEventListener("load", fitPhotoViewport);
+
+  photoDialogViewport.addEventListener("click", (event) => {
+    if (photoIgnoreNextClick) {
+      photoIgnoreNextClick = false;
+      return;
+    }
+
+    if (photoZoom > 1) {
+      resetPhotoZoom();
+    } else {
+      setPhotoZoom(2, event.clientX, event.clientY);
+    }
+  });
+
+  window.addEventListener("resize", () => {
+    if (photoDialog?.open) {
+      fitPhotoViewport();
+    }
+  });
+
+  photoDialogViewport.addEventListener(
+    "wheel",
+    (event) => {
+      if (!photoDialog?.open) {
+        return;
+      }
+
+      event.preventDefault();
+      setPhotoZoom(photoZoom * Math.exp(-event.deltaY * 0.0015), event.clientX, event.clientY);
+    },
+    { passive: false },
+  );
+
+  photoDialogViewport.addEventListener("pointerdown", (event) => {
+    if (event.pointerType !== "touch" && photoZoom <= 1) {
+      return;
+    }
+    if (event.pointerType === "mouse" && event.button !== 0) {
+      return;
+    }
+
+    if (photoPointers.size === 0) {
+      photoPointerMoved = false;
+    }
+    photoPointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
+    photoDialogViewport.setPointerCapture(event.pointerId);
+    if (photoPointers.size === 2) {
+      const [first, second] = Array.from(photoPointers.values());
+      photoPinchState = {
+        distance: Math.hypot(second.x - first.x, second.y - first.y),
+        x: (first.x + second.x) / 2,
+        y: (first.y + second.y) / 2,
+      };
+    }
+    updatePhotoZoom();
+  });
+
+  photoDialogViewport.addEventListener("pointermove", (event) => {
+    const pointer = photoPointers.get(event.pointerId);
+    if (!pointer) {
+      return;
+    }
+
+    event.preventDefault();
+    const previousX = pointer.x;
+    const previousY = pointer.y;
+    if (Math.hypot(event.clientX - previousX, event.clientY - previousY) > 5) {
+      photoPointerMoved = true;
+    }
+    pointer.x = event.clientX;
+    pointer.y = event.clientY;
+
+    if (photoPointers.size >= 2) {
+      const [first, second] = Array.from(photoPointers.values());
+      const distance = Math.hypot(second.x - first.x, second.y - first.y);
+      const midpointX = (first.x + second.x) / 2;
+      const midpointY = (first.y + second.y) / 2;
+      if (photoPinchState && photoPinchState.distance > 0) {
+        setPhotoZoom(
+          photoZoom * (distance / photoPinchState.distance),
+          photoPinchState.x,
+          photoPinchState.y,
+        );
+        photoPanX += midpointX - photoPinchState.x;
+        photoPanY += midpointY - photoPinchState.y;
+        updatePhotoZoom();
+      }
+      photoPinchState = { distance, x: midpointX, y: midpointY };
+    } else if (photoZoom > 1) {
+      photoPanX += event.clientX - previousX;
+      photoPanY += event.clientY - previousY;
+      updatePhotoZoom();
+    }
+  });
+
+  const finishPhotoPointer = (event) => {
+    photoPointers.delete(event.pointerId);
+    if (photoPointerMoved) {
+      photoIgnoreNextClick = true;
+      window.setTimeout(() => {
+        photoIgnoreNextClick = false;
+      }, 0);
+    }
+    if (photoPointers.size < 2) {
+      photoPinchState = null;
+    }
+    updatePhotoZoom();
+  };
+  photoDialogViewport.addEventListener("pointerup", finishPhotoPointer);
+  photoDialogViewport.addEventListener("pointercancel", finishPhotoPointer);
 }
 
 function getMaximumPageScroll() {
@@ -141,7 +401,14 @@ fieldCarousels.forEach((carousel) => {
   const frame = carousel.querySelector(".field-carousel-frame");
   const slides = Array.from(carousel.querySelectorAll(".field-carousel-slide"));
   const counter = carousel.querySelector(".field-carousel-counter");
-  const autoplayToggle = carousel.querySelector(".field-carousel-autoplay-toggle");
+  const paginationButtons = Array.from(
+    carousel.querySelectorAll(".field-carousel-pagination button"),
+  );
+  const configuredInterval = Number.parseInt(carousel.dataset.interval || "", 10);
+  const autoplayInterval =
+    Number.isFinite(configuredInterval) && configuredInterval > 0
+      ? configuredInterval
+      : fieldCarouselAutoplayInterval;
   if (!frame || slides.length === 0) {
     return;
   }
@@ -149,7 +416,6 @@ fieldCarousels.forEach((carousel) => {
   let isDragging = false;
   let isInteracting = false;
   let didDrag = false;
-  let isAutoplayPaused = false;
   let activeIndex = 0;
   let dragStartX = 0;
   let dragStartScrollLeft = 0;
@@ -159,23 +425,20 @@ fieldCarousels.forEach((carousel) => {
       return;
     }
 
-    const otherElementFocused =
-      carousel.contains(document.activeElement) && document.activeElement !== autoplayToggle;
+    const otherElementFocused = carousel.contains(document.activeElement);
     counter.setAttribute(
       "aria-live",
-      prefersReducedMotion || isAutoplayPaused || otherElementFocused ? "polite" : "off",
+      prefersReducedMotion || otherElementFocused ? "polite" : "off",
     );
   };
 
   const shouldPauseAutoplay = () => {
     const bounds = carousel.getBoundingClientRect();
-    const otherElementFocused =
-      carousel.contains(document.activeElement) && document.activeElement !== autoplayToggle;
+    const otherElementFocused = carousel.contains(document.activeElement);
     const mouseHoveringFrame =
       window.matchMedia("(hover: hover)").matches && frame.matches(":hover");
 
     return (
-      isAutoplayPaused ||
       isInteracting ||
       mouseHoveringFrame ||
       otherElementFocused ||
@@ -195,42 +458,53 @@ fieldCarousels.forEach((carousel) => {
       slide.tabIndex = isActive ? 0 : -1;
     });
 
+    paginationButtons.forEach((button, buttonIndex) => {
+      if (buttonIndex === activeIndex) {
+        button.setAttribute("aria-current", "true");
+      } else {
+        button.removeAttribute("aria-current");
+      }
+    });
+
     if (counter) {
       counter.textContent = `${activeIndex + 1} / ${slides.length}`;
     }
     updateCounterAnnouncement();
   };
 
-  if (autoplayToggle) {
-    autoplayToggle.hidden = prefersReducedMotion || slides.length < 2;
-    autoplayToggle.addEventListener("click", () => {
-      isAutoplayPaused = !isAutoplayPaused;
-      autoplayToggle.textContent = isAutoplayPaused ? "Resume" : "Pause";
-      autoplayToggle.setAttribute(
-        "aria-label",
-        isAutoplayPaused ? "Resume automatic slide changes" : "Pause automatic slide changes",
-      );
-      updateCounterAnnouncement();
+  paginationButtons.forEach((button, index) => {
+    button.addEventListener("click", () => {
+      frame.scrollTo({
+        left: index * frame.clientWidth,
+        behavior: prefersReducedMotion ? "auto" : "smooth",
+      });
     });
-  }
+  });
 
   carousel.addEventListener("focusin", updateCounterAnnouncement);
   carousel.addEventListener("focusout", () => {
     window.requestAnimationFrame(updateCounterAnnouncement);
   });
 
-  slides.forEach((slide) => {
-    const caption = slide.alt || "Carousel photo";
-    slide.setAttribute("role", "button");
-    slide.setAttribute("aria-label", `View full-size photo: ${caption}`);
-    slide.addEventListener("keydown", (event) => {
-      if (event.key !== "Enter" && event.key !== " ") {
-        return;
-      }
+  slides.forEach((slide, slideIndex) => {
+    if (slide instanceof HTMLImageElement) {
+      const caption = slide.alt || "Carousel photo";
+      slide.setAttribute("role", "button");
+      slide.setAttribute("aria-label", `View full-size photo: ${caption}`);
+      slide.addEventListener("keydown", (event) => {
+        if (event.key !== "Enter" && event.key !== " ") {
+          return;
+        }
 
-      event.preventDefault();
-      openPhotoViewer(slide.currentSrc || slide.src, caption);
-    });
+        event.preventDefault();
+        openPhotoViewer(slide.currentSrc || slide.src, caption);
+      });
+      return;
+    }
+
+    const title = slide.dataset.title || "Carousel information";
+    slide.setAttribute("role", "group");
+    slide.setAttribute("aria-label", `Slide ${slideIndex + 1} of ${slides.length}: ${title}`);
   });
 
   frame.addEventListener("click", (event) => {
@@ -244,7 +518,10 @@ fieldCarousels.forEach((carousel) => {
     }
 
     const clickedSlide =
-      slides.find((slide) => slide === event.target) ?? slides[activeIndex];
+      slides.find((slide) => slide.contains(event.target)) ?? slides[activeIndex];
+    if (!(clickedSlide instanceof HTMLImageElement)) {
+      return;
+    }
     openPhotoViewer(clickedSlide.currentSrc || clickedSlide.src, clickedSlide.alt || "Carousel photo");
   });
 
@@ -310,7 +587,7 @@ fieldCarousels.forEach((carousel) => {
   frame.addEventListener("dragstart", (event) => event.preventDefault());
   updateSlide(0);
 
-  if (!prefersReducedMotion && slides.length > 1) {
+  if (carousel.dataset.autoplay !== "false" && !prefersReducedMotion && slides.length > 1) {
     window.setInterval(() => {
       if (shouldPauseAutoplay()) {
         return;
@@ -321,7 +598,7 @@ fieldCarousels.forEach((carousel) => {
         left: nextIndex * frame.clientWidth,
         behavior: nextIndex === 0 ? "auto" : "smooth",
       });
-    }, fieldCarouselAutoplayInterval);
+    }, autoplayInterval);
   }
 });
 
@@ -410,7 +687,7 @@ if (pageScrollbarTrack && pageScrollbarLine) {
 
 if (!prefersReducedMotion && "IntersectionObserver" in window) {
   const revealTargets = document.querySelectorAll(
-    ".field-update-inner, .focus-heading, .metal-card, .approach-grid, .closing-content, .presentation-heading, .presentation-outline",
+    ".field-update-inner, .focus-heading, .metal-card, .closing-content, .presentation-heading, .presentation-outline",
   );
   const revealObserver = new IntersectionObserver(
     (entries, observer) => {
@@ -464,6 +741,13 @@ document.querySelectorAll(".brand-logo-trigger").forEach((trigger) => {
       openPhotoViewer(logo.src, "VA ROVIENG CO.,LTD logo");
     }
   });
+});
+
+projectMapTrigger?.addEventListener("click", () => {
+  const map = projectMapTrigger.querySelector(".project-map");
+  if (map) {
+    openPhotoViewer(map.currentSrc || map.src, map.alt);
+  }
 });
 
 if (photoDialogClose && photoDialog) {

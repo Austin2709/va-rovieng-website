@@ -27,6 +27,7 @@
     <script src="script.js" defer></script>
   </head>
   <body>
+    <div class="page-transition-overlay" aria-hidden="true"></div>
     <a class="skip-link" href="#main">Skip to content</a>
 
     <div class="page-scrollbar">
@@ -74,15 +75,14 @@
       </button>
 
       <nav class="primary-nav" id="primary-nav" aria-label="Main navigation">
-        <a href="#overview">Our beginning</a>
-        <a href="#focus">Areas of interest</a>
-        <a href="#approach">Our approach</a>
+        <span class="mobile-nav-heading" aria-hidden="true">Explore VA ROVIENG</span>
+        <a href="#top" aria-current="page">Home</a>
+        <a href="#area-size">Areas of constructions site</a>
         <a href="presentations.html">Credentials &amp; Certifications</a>
-        <a class="nav-cta" href="#project">
-          Our early focus
-          <svg class="icon-arrow icon-arrow-down-right" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
-            <path d="M4 4 12 12M5 12H12V5" />
-          </svg>
+        <a href="engineer.html">Engineer</a>
+        <a href="scientific-researcher.html">Scientific Researcher</a>
+        <a class="nav-cta" href="guiding-documents.html">
+          Guiding Documents
         </a>
       </nav>
     </header>
@@ -116,10 +116,7 @@
             decoding="async"
           />
           <span class="photo-viewer-hint" aria-hidden="true">
-            View full photo
-            <svg class="icon-arrow" viewBox="0 0 16 16" focusable="false">
-              <path d="M4 12 12 4M5 4H12V11" />
-            </svg>
+            Tap to view
           </span>
         </button>
         <div class="hero-content">
@@ -129,7 +126,7 @@
             journey in copper and gold exploration. We are building our
             foundation one step at a time.
           </p>
-          <a class="button button-gold" href="#overview">
+          <a class="button button-light" href="#overview">
             The Company <span aria-hidden="true">↓</span>
           </a>
         </div>
@@ -161,6 +158,10 @@
       <section class="overview section-wrap" id="overview">
         <div class="overview-grid">
           <h2>A new company.<br /><em>A careful first step.</em></h2>
+          <div class="map-area-label">
+            <span>Area size</span>
+            <strong>985.35 km²</strong>
+          </div>
           <div class="overview-copy">
             <p class="lead">
               VA ROVIENG CO.,LTD is at the beginning of its journey.
@@ -179,23 +180,25 @@
             </a>
           </div>
         </div>
-        <figure class="overview-visual">
-          <figcaption class="map-area-label">
-            <span>Area size</span>
-            <strong>985.35 km²</strong>
-          </figcaption>
-          <img
-            class="project-map"
-            src="images/project-area-map.jpg"
-            alt="Provided project-area map with boundary markers and coordinate grid"
-          />
+        <figure class="overview-visual" id="area-size">
+          <button
+            class="project-map-trigger"
+            type="button"
+            aria-label="View and zoom the project-area map"
+          >
+            <img
+              class="project-map"
+              src="images/project-area-map.jpg"
+              alt="Provided project-area map with boundary markers and coordinate grid"
+            />
+            <span class="project-map-hint">Click or tap to view and zoom</span>
+          </button>
         </figure>
       </section>
 
       <section class="field-update" id="drilling-activities" aria-labelledby="drilling-activities-title">
         <div class="field-update-inner">
           <div class="field-update-copy">
-            <span class="eyebrow">Company update / 01</span>
             <h2 id="drilling-activities-title">Drilling Activities</h2>
             <p>
               These photos give a closer look at drilling work in an outdoor
@@ -239,14 +242,6 @@
             <div class="field-carousel-status">
               <span class="field-carousel-counter" aria-live="polite" aria-atomic="true">1 / 2</span>
               <span class="field-carousel-hint">Swipe or drag to browse</span>
-              <button
-                class="field-carousel-autoplay-toggle"
-                type="button"
-                aria-label="Pause automatic slide changes"
-                hidden
-              >
-                Pause
-              </button>
             </div>
           </div>
         </div>
@@ -259,7 +254,6 @@
       >
         <div class="field-update-inner">
           <div class="field-update-copy">
-            <span class="eyebrow">Company update / 02</span>
             <h2 id="raw-material-from-machinery-drilling-title">Raw Material from Machinery Drilling</h2>
             <p>
               These photos show drill-core samples and broken rock arranged
@@ -285,17 +279,9 @@
               <div class="field-carousel-track">
                 <img
                   class="field-carousel-slide is-active"
-                  src="images/raw-material-from-machinery-drilling-01.png"
-                  alt="Drill core samples arranged in a red tray"
-                  fetchpriority="high"
-                  decoding="async"
-                  draggable="false"
-                />
-                <img
-                  class="field-carousel-slide"
                   src="images/raw-material-from-machinery-drilling-02.png"
                   alt="Drill cores and rock samples arranged in rows outdoors"
-                  loading="lazy"
+                  fetchpriority="high"
                   decoding="async"
                   draggable="false"
                 />
@@ -334,16 +320,8 @@
               </div>
             </div>
             <div class="field-carousel-status">
-              <span class="field-carousel-counter" aria-live="polite" aria-atomic="true">1 / 6</span>
+              <span class="field-carousel-counter" aria-live="polite" aria-atomic="true">1 / 5</span>
               <span class="field-carousel-hint">Swipe or drag to browse</span>
-              <button
-                class="field-carousel-autoplay-toggle"
-                type="button"
-                aria-label="Pause automatic slide changes"
-                hidden
-              >
-                Pause
-              </button>
             </div>
           </div>
         </div>
@@ -352,7 +330,6 @@
       <section class="field-update" id="raw-materials" aria-labelledby="raw-materials-title">
         <div class="field-update-inner">
           <div class="field-update-copy">
-            <span class="eyebrow">Company update / 03</span>
             <h2 id="raw-materials-title">Raw Materials</h2>
             <p>
               These close-up photographs focus on individual rock samples,
@@ -420,14 +397,6 @@
             <div class="field-carousel-status">
               <span class="field-carousel-counter" aria-live="polite" aria-atomic="true">1 / 5</span>
               <span class="field-carousel-hint">Swipe or drag to browse</span>
-              <button
-                class="field-carousel-autoplay-toggle"
-                type="button"
-                aria-label="Pause automatic slide changes"
-                hidden
-              >
-                Pause
-              </button>
             </div>
           </div>
         </div>
@@ -436,7 +405,6 @@
       <section class="field-update" id="machinery" aria-labelledby="machinery-title">
         <div class="field-update-inner">
           <div class="field-update-copy">
-            <span class="eyebrow">Company update / 04</span>
             <h2 id="machinery-title">Machinery</h2>
             <p>
               The machinery carousel brings together several kinds of
@@ -465,37 +433,33 @@
                 <img class="field-carousel-slide" src="images/machinery-03.png" alt="Yellow drilling equipment" loading="lazy" decoding="async" draggable="false" />
                 <img class="field-carousel-slide" src="images/machinery-04.png" alt="Machinery being loaded onto trucks" loading="lazy" decoding="async" draggable="false" />
                 <img class="field-carousel-slide" src="images/machinery-05.png" alt="Large industrial machinery" loading="lazy" decoding="async" draggable="false" />
-                <img class="field-carousel-slide" src="images/machinery-06.png" alt="Industrial screening equipment" loading="lazy" decoding="async" draggable="false" />
                 <img class="field-carousel-slide" src="images/machinery-07.png" alt="Machinery inside a workshop" loading="lazy" decoding="async" draggable="false" />
                 <img class="field-carousel-slide" src="images/machinery-08.png" alt="Yellow drilling machine" loading="lazy" decoding="async" draggable="false" />
                 <img class="field-carousel-slide" src="images/machinery-09.png" alt="Industrial crushing machine" loading="lazy" decoding="async" draggable="false" />
                 <img class="field-carousel-slide" src="images/machinery-10.png" alt="Drilling rig outdoors" loading="lazy" decoding="async" draggable="false" />
+                <img class="field-carousel-slide" src="images/machinery-11.png" alt="Large rusted wheel assembly beside gravel at an outdoor work site" loading="lazy" decoding="async" draggable="false" />
+                <img class="field-carousel-slide" src="images/machinery-12.png" alt="Green industrial hopper and motor on a concrete pad" loading="lazy" decoding="async" draggable="false" />
+                <img class="field-carousel-slide" src="images/machinery-13.png" alt="Diesel generator set beneath a shelter" loading="lazy" decoding="async" draggable="false" />
+                <img class="field-carousel-slide" src="images/machinery-14.png" alt="Large industrial machine in a covered work area" loading="lazy" decoding="async" draggable="false" />
+                <img class="field-carousel-slide" src="images/machinery-15.png" alt="Metal screening platform with rock pieces on top" loading="lazy" decoding="async" draggable="false" />
               </div>
             </div>
             <div class="field-carousel-status">
-              <span class="field-carousel-counter" aria-live="polite" aria-atomic="true">1 / 10</span>
+              <span class="field-carousel-counter" aria-live="polite" aria-atomic="true">1 / 14</span>
               <span class="field-carousel-hint">Swipe or drag to browse</span>
-              <button
-                class="field-carousel-autoplay-toggle"
-                type="button"
-                aria-label="Pause automatic slide changes"
-                hidden
-              >
-                Pause
-              </button>
             </div>
           </div>
         </div>
       </section>
 
-      <section class="focus-section" id="focus">
+      <section class="focus-section" id="focus" aria-labelledby="copper-title">
         <div class="section-wrap focus-inner">
           <div class="focus-heading">
-            <h2>Our interests.<br /><em>Taking shape.</em></h2>
+            <h2>Copper.<br /><em>Taking shape.</em></h2>
             <p>
-              Copper and gold are the company’s initial areas of interest.
-              We are at the beginning of learning what opportunities may be
-              present and will share project details when confirmed.
+              Copper is one of VA ROVIENG’s initial areas of interest. As the
+              company develops its exploration plans, it will share verified
+              project details when they are available.
             </p>
           </div>
           <div class="metal-grid">
@@ -508,18 +472,35 @@
                 aria-label="View full-size copper sample photo"
               >
                 <img class="metal-symbol metal-photo" src="images/copper-sample.jpg" alt="" />
-                <span class="metal-photo-zoom" aria-hidden="true">
-                  <svg class="icon-arrow" viewBox="0 0 16 16" focusable="false">
-                    <path d="M4 12 12 4M5 4H12V11" />
-                  </svg>
-                </span>
               </button>
               <div>
-                <span class="data-label">01 / Area of interest</span>
-                <h3>Copper</h3>
-                <p>One of the company’s initial areas of interest.</p>
+                <h2 id="copper-title">Copper</h2>
+                <p>
+                  Copper is one of the company’s initial areas of interest as
+                  it begins planning future exploration. Project-specific
+                  details will be shared as they are confirmed.
+                </p>
               </div>
             </article>
+          </div>
+        </div>
+      </section>
+
+      <section
+        class="focus-section focus-section--gold"
+        id="gold"
+        aria-labelledby="gold-section-title"
+      >
+        <div class="section-wrap focus-inner">
+          <div class="focus-heading">
+            <h2 id="gold-section-title">Gold.<br /><em>Taking shape.</em></h2>
+            <p>
+              Gold is another early area of interest for VA ROVIENG. Plans are
+              still taking shape, and verified project details will be shared
+              as they become available.
+            </p>
+          </div>
+          <div class="metal-grid">
             <article class="metal-card metal-gold">
               <button
                 class="metal-photo-trigger field-photo-trigger"
@@ -529,49 +510,23 @@
                 aria-label="View full-size gold sample photo"
               >
                 <img class="metal-symbol metal-photo" src="images/gold-sample.jpg" alt="" />
-                <span class="metal-photo-zoom" aria-hidden="true">
-                  <svg class="icon-arrow" viewBox="0 0 16 16" focusable="false">
-                    <path d="M4 12 12 4M5 4H12V11" />
-                  </svg>
-                </span>
               </button>
               <div>
-                <span class="data-label">02 / Area of interest</span>
-                <h3>Gold</h3>
-                <p>A second area of interest as our plans take shape.</p>
+                <h2>Gold</h2>
+                <p>
+                  Gold is one of VA ROVIENG’s initial areas of interest as it
+                  begins planning future exploration. The company is still at
+                  an early stage, so no specific locations or exploration
+                  results are claimed. Project details will be shared once
+                  confirmed.
+                </p>
               </div>
             </article>
           </div>
         </div>
       </section>
 
-      <section class="approach section-wrap" id="approach">
-        <div class="approach-grid">
-          <h2>Build the foundation.<br /><em>Then take the next step.</em></h2>
-          <div class="approach-copy">
-            <p>
-              At this early stage, we are learning, setting priorities and
-              building a clear foundation for future exploration planning.
-            </p>
-            <p>
-              We will share accurate updates as the company’s plans and
-              confirmed information develop, without presenting unverified
-              details as results.
-            </p>
-            <div class="approach-note">
-              <span class="note-icon" aria-hidden="true">
-                <svg class="icon-arrow" viewBox="0 0 16 16" focusable="false">
-                  <path d="M4 12 12 4M5 4H12V11" />
-                </svg>
-              </span>
-              <span>Clear updates, shared as the company grows.</span>
-            </div>
-          </div>
-        </div>
-      </section>
-
       <section class="closing">
-        <div class="closing-pattern" aria-hidden="true"></div>
         <div class="closing-content">
           <span class="eyebrow">VA ROVIENG CO.,LTD — A new beginning</span>
           <h2>A new beginning.<br />Built <em>one step at a time.</em></h2>
@@ -579,27 +534,20 @@
             Return to the top <span aria-hidden="true">↑</span>
           </a>
         </div>
-        <span class="closing-side-label" aria-hidden="true">NEW COMPANY / COPPER / GOLD</span>
       </section>
 
-      <section class="certifications section-wrap" id="certifications">
-        <div class="certifications-grid">
-          <h2>Credentials & Certifications.<br /><em>Officially registered.</em></h2>
-          <p class="certifications-intro">
-            VA ROVIENG CO., LTD is a legally registered company. View our
-            company registration, tax and VAT documents on the dedicated page.
-          </p>
-          <a class="button button-outline" href="presentations.html">
-            View company documents <span aria-hidden="true">&#8599;</span>
-          </a>
-        </div>
-      </section>
     </main>
 
     <dialog class="photo-dialog" aria-labelledby="photo-dialog-caption">
       <button class="photo-dialog-close" type="button" aria-label="Close photo viewer">×</button>
+      <div class="photo-dialog-controls" aria-label="Image zoom controls">
+        <output class="photo-zoom-level" aria-live="polite">100%</output>
+        <span>Click or tap the image to zoom; click again to reset. Scroll or pinch to zoom, drag to move.</span>
+      </div>
       <figure>
-        <img id="photo-dialog-image" alt="" />
+        <div class="photo-dialog-viewport">
+          <img id="photo-dialog-image" alt="" />
+        </div>
         <figcaption id="photo-dialog-caption"></figcaption>
       </figure>
     </dialog>
