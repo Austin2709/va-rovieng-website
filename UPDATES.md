@@ -2,6 +2,7 @@
 
 Updated 2026-11-17.
 
+- Replaced the Mine Planning Book executive-summary image with the supplied full image, restoring the Technical Lead, Target Mineral, and Project Status details.
 - Removed the numbered "Area of interest" labels from the Copper and Gold cards.
 - Set the Mine Planning Book carousel to advance automatically every eight seconds.
 - Refined the Scientific Researcher credential descriptions.
