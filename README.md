@@ -4,7 +4,7 @@ A modern, responsive website for VA ROVIENG CO.,LTD - A newly established compan
 
 ## 🌐 Live Website
 
-Visit the website: [VA ROVIENG CO.,LTD](https://github.com/Austin2709/va-rovieng-website)
+Visit the website: [VA ROVIENG CO.,LTD](https://varovieng.github.io/VAROVIENG-website/)
 
 ## 📋 Project Overview
 
